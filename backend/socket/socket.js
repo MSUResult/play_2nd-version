@@ -53,6 +53,22 @@ export const socketHandler = (io) => {
       handleChallengeAccept(io, onlineUsers, data);
     });
 
+    socket.on('playerMove', ({roomId , playerId, move}) => {
+      socket.to(roomId).emit('opponentMove', {
+        playerId,
+        move
+      })
+    })
+
+
+   socket.on("roundResult", ({ roomId, result }) => {
+  io.to(roomId).emit("roundResultUpdate", result);
+});
+
+
+
+
+
     // DISCONNECT
     socket.on("disconnect", () => {
       console.log("User disconnected:", socket.id);

@@ -15,7 +15,9 @@ const userSchema = new mongoose.Schema(
 
     email: {
       type: String,
-      default: null,
+      
+      unique:true,
+       sparse: true
     },
 
     age: {
@@ -35,7 +37,7 @@ const userSchema = new mongoose.Schema(
 
     currency: {
       type: Number,
-      default: null,
+      default: 0,
     },
 
     provider: {

@@ -11,6 +11,10 @@ export function SocketProvider({ children }) {
   const [incomingChallenge, setIncomingChallenge] = useState(null);
   const [matchRoom, setMatchRoom] = useState(null);
 
+  // NEW: Game-specific states
+  const [opponentMove, setOpponentMove] = useState(null);
+  const [syncedWinner, setSyncedWinner] = useState(null);
+
   useEffect(() => {
     if (loading) return;
 
@@ -84,6 +88,45 @@ export function SocketProvider({ children }) {
       socket.off("matchStart", handleMatchStart);
     };
   }, []);
+  
+
+
+
+  // NEW: LISTEN FOR GAME EVENTS 
+
+  useEffect(()=> {
+    const handleOpponentMove = (data) => {
+      console.log("Opponent played:", data.move);
+      setOpponentMove(data.move);
+    };
+
+    const handleRoundResultSync = (result) => {
+      console.log("Round result synced:", result);
+      setSyncedWinner(result);
+    };
+
+    socket.on("opponentMove", handleOpponentMove);
+    socket.on("roundResultSync", handleRoundResultSync);
+
+  return () => {
+      socket.off("opponentMove", handleOpponentMove);
+      socket.off("roundResultSync", handleRoundResultSync);
+    };
+  },[])
+
+  const resetRoundData = ()=> {
+    setOpponentMove(null)
+    setSyncedWinner(null)
+  }
+
+
+
+
+
+
+
+
+
 
   const sendMove = (type, data) => {
     socket.emit(type, { ...data });
@@ -97,6 +140,9 @@ export function SocketProvider({ children }) {
         incomingChallenge,
         setIncomingChallenge,
         matchRoom,
+        opponentMove,
+        syncedWinner,
+        resetRoundData
       }}
     >
       {children}
